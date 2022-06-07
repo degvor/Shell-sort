@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+from time import sleep
 from tkinter.filedialog import asksaveasfilename
 
 import classes
@@ -199,55 +200,139 @@ class GraphicSort(tk.Tk):
         self.height = height
         self.position = position
 
-    def sort_graph_classic(self):
+    def draw_graph(self, massiv, comparisons, transposition, pos=-1):
         self.canvas.delete("all")
-        sorted_height = classes.Sort(self.height.copy()).classic_shell_sort()
-        text = sorted_height[0]
-        text_rev = text[::-1]
-        comparisons = sorted_height[1]
-        transposition = sorted_height[2]
-        for i in range(len(text)):
-            self.canvas.create_line(self.position[i], 600, self.position[i], text_rev[i], fill="red", width=4)
+        rev = massiv[::-1]
+        for i in range(len(massiv)):
+            self.canvas.create_line(self.position[i], 600, self.position[i], rev[i],
+                                    fill="yellow" if i == pos else "red", width=4)
         self.label_comparisons.config(text=comparisons)
         self.label_transposition.config(text=transposition)
+        self.update()
+        sleep(0.2)
+
+    def sort_graph_classic(self):
+        self.canvas.delete("all")
+        comparisons = 0
+        transposition = 0
+        massiv = self.height.copy()
+        step = len(massiv) // 2
+        while step > 0:
+            for i in range(step, len(massiv)):
+                current_value = massiv[i]
+                position = i
+                comparisons += 1
+
+                while position >= step and massiv[position - step] > current_value:
+                    massiv[position] = massiv[position - step]
+                    transposition += 1
+                    position -= step
+                    massiv[position] = current_value
+
+                    self.draw_graph(massiv, comparisons, transposition, position)
+
+            step //= 2
 
     def sort_graph_sedgewick(self):
         self.canvas.delete("all")
-        sorted_height = classes.Sort(self.height.copy()).sedgewick_shell_sort()
-        text = sorted_height[0]
-        text_rev = text[::-1]
-        comparisons = sorted_height[1]
-        transposition = sorted_height[2]
-        for i in range(len(text)):
-            self.canvas.create_line(self.position[i], 600, self.position[i], text_rev[i], fill="red", width=4)
-        self.label_comparisons.config(text=comparisons)
-        self.label_transposition.config(text=transposition)
+        comparisons = 0
+        transposition = 0
+        sorting_number = []
+        massiv = self.height.copy()
+
+        for i in range(0, len(massiv)):
+            if i % 2 == 0:
+                step = int(9 * 2 ** i - 9 * 2 ** (i / 2) + 1)
+                sorting_number.append(step)
+            else:
+                step = int(8 * 2 ** i - 6 * 2 ** ((i + 1) / 2) + 1)
+                sorting_number.append(step)
+            if sorting_number[i] * 3 > len(massiv):
+                break
+
+        sorting_number.reverse()
+        sorting_number = sorting_number[1:]
+
+        last_index = len(massiv)
+
+        for step in sorting_number:
+            for i in range(step, last_index, 1):
+                j = i
+                delta = j - step
+
+                while delta >= 0 and massiv[delta] > massiv[j]:
+                    massiv[delta], massiv[j] = massiv[j], massiv[delta]
+                    j = delta
+                    delta = j - step
+                    comparisons += 1
+                    transposition += 1
+                    self.draw_graph(massiv, comparisons, transposition, delta)
+                if delta >= 0:
+                    comparisons += 1
 
     def sort_graph_fibo(self):
         self.canvas.delete("all")
-        sorted_height = classes.Sort(self.height.copy()).fibonachi_shell_sort()
-        text = sorted_height[0]
-        text_rev = text[::-1]
-        comparisons = sorted_height[1]
-        transposition = sorted_height[2]
-        for i in range(len(text)):
-            self.canvas.create_line(self.position[i], 600, self.position[i], text_rev[i], fill="red", width=4)
-        self.label_comparisons.config(text=comparisons)
-        self.label_transposition.config(text=transposition)
+
+        comparisons = 0
+        transposition = 0
+        massiv = self.height.copy()
+
+        Fibo_numbers = [0 for i in range(0, len(massiv))]
+        for i in range(0, len(massiv)):
+            if i == 0:
+                Fibo_numbers[i] = 0
+            elif i == 1:
+                Fibo_numbers[i] = 1
+            elif i >= 2:
+                Fibo_numbers[i] = Fibo_numbers[i - 2] + Fibo_numbers[i - 1]
+        Fibo_numbers.reverse()
+        Fibo_numbers = Fibo_numbers[1:]
+
+        last_index = len(massiv)
+
+        for step in Fibo_numbers:
+            for i in range(step, last_index, 1):
+                j = i
+                delta = j - step
+                while delta >= 0 and massiv[delta] > massiv[j]:
+                    massiv[delta], massiv[j] = massiv[j], massiv[delta]
+                    j = delta
+                    delta = j - step
+                    transposition += 1
+                    comparisons += 1
+                    self.draw_graph(massiv, comparisons, transposition, delta)
+                if delta >= 0:
+                    comparisons += 1
 
     def sort_graph_tokuda(self):
         self.canvas.delete("all")
-        sorted_height = classes.Sort(self.height.copy()).tokuda_shell_sort()
-        text = sorted_height[0]
-        text_rev = text[::-1]
-        comparisons = sorted_height[1]
-        transposition = sorted_height[2]
-        for i in range(len(text)):
-            self.canvas.create_line(self.position[i], 600, self.position[i], text_rev[i], fill="red", width=4)
-        self.label_comparisons.config(text=comparisons)
-        self.label_transposition.config(text=transposition)
 
-    # x0(position) y0(static)  x1(static) y1(height)
+        comparisons = 0
+        transposition = 0
+        sorting_number = []
+        massiv = self.height.copy()
+
+        for i in range(0, 13):
+            step = int(1 / 5 * (9 * (9 / 4) ** (i - 1) - 4))
+            sorting_number.append(step)
+
+        sorting_number.reverse()
+        sorting_number = sorting_number[1:]
+        last_index = len(massiv)
+
+        for step in sorting_number:
+            for i in range(step, last_index, 1):
+                j = i
+                delta = j - step
+                while delta >= 0 and massiv[delta] > massiv[j]:
+                    massiv[delta], massiv[j] = massiv[j], massiv[delta]
+                    j = delta
+                    delta = j - step
+                    transposition += 1
+                    comparisons += 1
+                    self.draw_graph(massiv, comparisons, transposition, delta)
+                if delta >= 0:
+                    comparisons += 1
 
     def dell_draw(self):
         self.label_comparisons.config(text="")
