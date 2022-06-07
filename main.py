@@ -1,7 +1,6 @@
-import classes
+import windows
 
-
-app = classes.Window()
-app.title("Shell Sort Program")
-app.geometry("1800x900")
-app.mainloop()
+if __name__ == '__main__':
+    windows.app.title("Shell Sort Program")
+    windows.app.geometry("1800x900")
+    windows.app.mainloop()
