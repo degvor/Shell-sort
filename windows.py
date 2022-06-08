@@ -17,7 +17,7 @@ class MainWindow(tk.Tk):
         file_menu = tk.Menu(menu, tearoff=0)
 
         file_menu.add_command(label="Graph Sort", command=self.show_window_graph)
-        file_menu.add_command(label="Open", command=self.destroy)
+        # file_menu.add_command(label="Open")
         file_menu.add_command(label="Save", command=self.save_file)
         file_menu.add_command(label="Exit", command=self.destroy)
 
@@ -77,9 +77,9 @@ class MainWindow(tk.Tk):
         )
         if not filepath:
             return
-        massiv_of_numbers = self.massiv[0]
-        comparisons = str(self.massiv[1])
-        transposition = str(self.massiv[2])
+        massiv_of_numbers = self.sorted_massiv[0]
+        comparisons = str(self.sorted_massiv[1])
+        transposition = str(self.sorted_massiv[2])
 
         for i, element in enumerate(massiv_of_numbers):
             massiv_of_numbers[i] = str(element)
